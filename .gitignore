@@ -4,3 +4,4 @@ Vagrantfile
 vendor/
 node_modules/
 
+.env
