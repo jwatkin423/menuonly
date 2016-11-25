@@ -13,7 +13,6 @@
         @else
             @include('dashboard.partials.admin')
         @endif
-
     </div>
 
 
