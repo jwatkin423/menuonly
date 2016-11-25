@@ -24,77 +24,110 @@ class AddressController extends Controller {
     return addr::find($id);
   }
 
-  public function create($address_id) {
-    $Address = Addresses::where('address_id', $address_id)->with('business')->first();
+  public function create($ext_id, $extType) {
+    $Address = new Addresses();
 
-    $collect = collect($Address)->toArray();
-
-    $Business = $collect['business'];
+    $Business = ['business_id' => $ext_id];
     $Businesses = Businesses::select('business_id', 'business_name')->get();
     $businesses = $Businesses->pluck('business_name', 'business_id');
+
+//    $businessSelectParams = ['class' => 'form-control', 'id' => 'business-address', 'disabled'];
+    $businessSelectParams = ['class' => 'form-control', 'id' => 'business-address'];
 
     return view('address.edit')
       ->with('edit', false)
       ->with('address', $Address)
       ->with('business', $Business)
+      ->with('ext_id', $ext_id)
+      ->with('extType', $extType)
+      ->with('busSelParams', $businessSelectParams)
+      ->with('buttonName', 'Create')
       ->with('businesses', $businesses);
 
   }
 
-  public function store(Request $address) {
-    if ($address->input('entity_type') == 'b') {
-      $addressData['business_id'] = $address->input('entity_id');
-    } else {
-      $addressData['user_id'] = $address->input('entity_id');
-    }
+  public function store(Request $add) {
+    $address = $add->except('_token', 'address_business_id', 'address_user_id');
 
-    $addressData['address_one'] = $address->input('address_one');
-    $addressData['address_two'] = $address->input('address_two');
-    $addressData['city'] = $address->input('city');
-    $addressData['state'] = $address->input('state');
-    $addressData['zip_code'] = $address->input('zip_code');
-
-    $address = new Addresses();
-
-    if ($address->save($addressData)) {
-      return view();
+    $Addresses = new Addresses();
+    $Addresses->fill($address);
+    if ($Addresses->save()) {
+      \Log::debug('Saved!');
+      \Log::debug("The new address id: {$Addresses->address_id}");
+      return redirect()->route('view.business',
+        [
+          'business_id' => $address['business_id'],
+          'changed' => $Addresses->address_id,
+          'msg' => 'Successfully created new address'
+        ]
+      );
     }
   }
 
   public function view($address_id) {
     $Address = Addresses::where('address_id', $address_id)->first();
 
-    return view('address.edit')->with('address', $Address);
+    return view('address.view')->with('address', $Address);
   }
 
-  public function edit($address_id) {
-    $Address = Addresses::where('address_id', $address_id)->with('business')->first();
+  public function edit($address_id, $extType) {
+    if ($extType == 'B') {
 
-    $collect = collect($Address)->toArray();
+      $Address = Addresses::where('address_id', $address_id)->with('business')->first();
 
-    $Business = $collect['business'];
-    $Businesses = Businesses::select('business_id', 'business_name')->get();
-    $businesses = $Businesses->pluck('business_name', 'business_id');
+      $collect = collect($Address)->toArray();
 
-    return view('address.edit')
-      ->with('edit', true)
-      ->with('address', $Address)
-      ->with('business', $Business)
-      ->with('businesses', $businesses);
+      $Business = $collect['business'];
+      $Businesses = Businesses::select('business_id', 'business_name')->get();
+      $businesses = $Businesses->pluck('business_name', 'business_id');
+
+      $businessSelectParams = ['class' => 'form-control', 'id' => 'business-address'];
+
+      return view('address.edit')
+        ->with('edit', true)
+        ->with('extType', $extType)
+        ->with('address', $Address)
+        ->with('busSelParams', $businessSelectParams)
+        ->with('buttonName', 'Update')
+        ->with('business', $Business)
+        ->with('businesses', $businesses);
+
+    } elseif ($extType == 'U') {
+
+      $Address = Addresses::where('address_id', $address_id)->with('user')->first();
+
+      $collect = collect($Address)->toArray();
+
+      $User = $collect['user'];
+      $Users = Users::select('user_id', 'first_name')->get();
+      $users = $Users::pluck('user_id', 'first_name');
+
+      return view('address.edit')
+        ->with('edit', true)
+        ->with('extType', $extType)
+        ->with('address', $Address)
+        ->with('user', $User)
+        ->with('users', $users);
+
+    }
+
   }
 
   public function update(Request $update) {
-    $data = $update->except('_token', 'address_business_id');
+    $data = $update->except('_token', 'address_business_id', 'address_user_id');
 
     $Addresses = Addresses::find($data['address_id']);
 
-    foreach ($data as $key => $value) {
-      $Addresses->$key = $value;
-    }
+    $Addresses->fill($data);
 
     if ($Addresses->save()) {
-      \Log::debug('Save successful!');
-      return redirect()->route('db.home', ['user_id' => Auth::user()->user_id]);
+      return redirect()->route('view.business',
+        [
+          'business_id' => $data['business_id'],
+          'changed' => $data['address_id'],
+          'msg' => 'Updated the address successfully',
+          'status' => 1
+        ]);
     }
 
     return false;
