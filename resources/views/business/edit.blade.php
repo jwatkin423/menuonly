@@ -15,12 +15,12 @@
                 <div class="row">
                   <div class="row">
                     <div class="col-sm-6 pull-left"><h4>Addresses</h4></div>
-                    <div class="col-sm-6"><a class="btn btn-sm pull-right" href="{{ URL::route('create.business.address', ['address_id' => $business['business_id']]) }}">
+                    <div class="col-sm-6"><a class="btn btn-md pull-right" href="{{ URL::route('create.address', ['address_id' => $business['business_id'], 'extType' => 'B']) }}">
                         <span class="glyphicon glyphicon-plus-sign"></span> Add</a></div>
                   </div>
 
                   <table class="table table-responsive table-bordered">
-                    <teahd>
+                    <thead>
                       <tr>
                         <th>Address One</th>
                         <th>Address Two</th>
@@ -29,7 +29,7 @@
                         <th>Postal Code</th>
                         <th>Actions</th>
                       </tr>
-                    </teahd>
+                    </thead>
                     <tbody>
                     @foreach($value as $address)
                       @include('business.address_business_table', ['$address' => $address])
@@ -39,9 +39,13 @@
                 </div>
               @elseif($key == 'users')
                 <div class="row">
-                  <h4>Users</h4>
+                  <div class="row">
+                    <div class="col-sm-6 pull-left"><h4>Users</h4></div>
+                    <div class="col-sm-6"><a class="btn btn-md pull-right" href="{{ URL::route('create.user', ['ext_id' => $business['business_id']]) }}">
+                        <span class="glyphicon glyphicon-plus-sign"></span> Add</a></div>
+                  </div>
                   <table class="table table-responsive table-bordered">
-                    <teahd>
+                    <thead>
                       <tr>
                         <th>First Name</th>
                         <th>Last Name</th>
@@ -50,7 +54,7 @@
                         <th>Email</th>
                         <th>Actions</th>
                       </tr>
-                    </teahd>
+                    </thead>
                     <tbody>
                     @foreach($value as $user)
                       @include('business.user_business_table', ['user' => $user])

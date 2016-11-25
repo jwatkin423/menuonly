@@ -15,10 +15,10 @@ class BusinessController extends Controller
     $this->middleware('auth');
   }
 
-  public function view(Request $post) {
-    $business = $post->except('_token');
-    $businessId = $business['business'];
-    Log::debug("Business Id: {$businessId}");
+  public function view(Request $get) {
+    $businessId = $get->input('business_id');
+    $changed = $get->input('changed');
+
     $Business = Businesses::select(['business_name', 'business_id','business_type_id'])
       ->where('business_id', $businessId)
       ->with('addresses', 'users', 'businessType')
@@ -28,6 +28,9 @@ class BusinessController extends Controller
 
     return view('business.edit')
       ->with('business', $Business->toArray())
+      ->with('changed', $changed)
+      ->with('msg', null)
+      ->with('status', null)
       ->with('config', $businessConfig);
   }
 

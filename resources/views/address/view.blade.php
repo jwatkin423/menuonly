@@ -1,5 +1,7 @@
+@extends('layouts.app')
+
+@section('content')
 <div class="container">
-  {{ ddd($address) }}
   <div class="row">
     {{ Form::model($address, ['route' => ['update.address', $address->address_id]], ['class' => 'form-inline']) }}
     <div class="form-group">
@@ -25,3 +27,4 @@
     {{ Form::close() }}
   </div>
 </div>
+@endsection

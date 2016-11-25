@@ -6,7 +6,7 @@ use App\Address;
 use App\Http\Requests;
 use Illuminate\Http\Request;
 use App\User;
-use App\Address as addr;
+use App\Addresses;
 
 class UserController extends Controller {
   /**
@@ -21,7 +21,7 @@ class UserController extends Controller {
   /**
    * Show the application dashboard.
    *
-   * @return \Illuminate\Http\Response
+   * @return array()
    */
   public function getUserById($id) {
     $user = $this->_getUserById($id);
@@ -37,68 +37,77 @@ class UserController extends Controller {
     return User::find($id);
   }
 
-  public function create(Request $request) {
+
+  public function create($businessId) {
+    $User = new User();
+
+    return view('user.edit')
+      ->with('user', $User)
+      ->with('edit', false)
+      ->with('business_id', $businessId);
+  }
+
+  public function store(Request $request) {
+    $business_id = $request->input('business_id');
     $user = New User();
     $user->first_name = $request->input('first_name');
+    $user->business_id = $business_id;
     $user->last_name = $request->input('last_name');
     $user->user_type = $request->input('user_type');
+    $user->email = $request->input('email');
+    $user->phone_number = $request->input('phone_number');
     $user->password = $request->input('password');
 
-    if ($user->save()) {
+    $Address = new Addresses();
 
-      /*$addressData['address_one'] = $request->input('address_one');
-      $addressData['address_two'] = $request->input('address_two');
-      $addressData['city'] = $request->input('city');
-      $addressData['state'] = $request->input('state');
-      $addressData['zip_code'] = $request->input('zip_code');
-      $addressResult = $this->addAddress($addressData);*/
-      return redirect()->route('user.profile', ['user_id' => $user->user_id]);
-      /*if ($addressResult) {
-        return true;
-      } else {
-        return view('user.edit')->with('errors', $addressResult->errors);
-      }*/
+    $Address->business_id = $request->input('business_id');
+    $Address->user_id = $request->input('user_id');
+    $Address->address_one = $request->input('address_one');
+    $Address->address_two = $request->input('address_two');
+    $Address->city = $request->input('city');
+    $Address->state = $request->input('state');
+    $Address->zip_code = $request->input('zip_code');
 
-    } else {
-
+    if ($user->save() && $user->address()->save($Address)) {
+      return redirect()->route('view.business', ['business_id' => $business_id]);
     }
 
+  }
+
+  public function edit($user_id) {
+    $User = User::find($user_id)->with('address')->first();
+
+    return view('user.edit')
+      ->with('user', $User)
+      ->with('user_id', $user_id)
+      ->with('edit', true)
+      ->with('business_id', $User->business_id);
   }
 
   public function update(Request $request) {
     $user = User::find($request->input('user_id'));
 
-    $userData['first_name'] = $request->input('first_name');
-    $userData['last_name'] = $request->input('last_name');
-    $userData['user_type'] = $request->input('user_type');
+    $user->first_name = $request->input('first_name');
+    $user->last_name = $request->input('last_name');
+    $user->user_type = $request->input('user_type');
+    $user->email = $request->input('email');
+    $user->phone_number = $request->input('phone_number');
+    $business_id = $request->input('business_id');
 
-    if ($user->save($userData)) {
+    $Address = Addresses::findOrFail($request->input('address_id'));
 
-      $address = new Address;
-      $address->user_id = $request->input($user->user_id);
-      $address->address_one = $request->input('address_one');
-      $address->address_two = $request->input('address_two');
-      $address->city = $request->input('city');
-      $address->state = $request->input('state');
-      $address->zip_code = $request->input('zip_code');
+    $Address->business_id = $request->input('business_id');
+    $Address->user_id = $request->input('user_id');
+    $Address->address_one = $request->input('address_one');
+    $Address->address_two = $request->input('address_two');
+    $Address->city = $request->input('city');
+    $Address->state = $request->input('state');
+    $Address->zip_code = $request->input('zip_code');
 
-      $addressResult = $user->address()->save($address);
-
-      if ($addressResult) {
-        return true;
-      } else {
-        return view('user.edit')->with('errors', $addressResult->errors);
-      }
-
+    if ($user->save() && $user->address()->save($Address)) {
+      return redirect()->route('view.business', ['business_id' => $business_id]);
     }
-  }
 
-  public function addresses() {
-    return $this->hasMany('App\Address', 'user_id', 'user_id');
-  }
-
-  public function business() {
-    return $this->belongsTo('App\Business', 'business_id', 'business_id');
   }
 
 }
