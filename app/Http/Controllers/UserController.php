@@ -18,26 +18,6 @@ class UserController extends Controller {
 
   }
 
-  /**
-   * Show the application dashboard.
-   *
-   * @return array()
-   */
-  public function getUserById($id) {
-    $user = $this->_getUserById($id);
-    return view('user.profile')->with('user', $user);
-  }
-
-  public function editUserById($id) {
-    $user = $this->_getUserById($id);
-    return view('user.edit')->with('user', $user);
-  }
-
-  private function _getUserById($id) {
-    return User::find($id);
-  }
-
-
   public function create($businessId) {
     $User = new User();
 

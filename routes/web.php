@@ -46,3 +46,13 @@ Route::group(['prefix' => '/user'], function() {
   Route::post('/update', ['uses' => 'UserController@update', 'as' => 'update.user']);
   Route::get('/delete/{user_id}', ['uses' => 'UserController@delete', 'as' => 'delete.user']);
 });
+
+
+Route::group(['prefix' => '/menu'], function() {
+  Route::get('/create', ['uses' => 'MenuController@create', 'as' => 'create.menu']);
+  Route::post('/store', ['uses' => 'MenuController@store', 'as' => 'add.menu']);
+  Route::get('/view/{address_id}', ['uses' => 'MenuController@view', 'as' => 'view.menu']);
+  Route::get('/edit/{menu_id}', ['uses' => 'MenuController@edit', 'as' => 'edit.menu']);
+  Route::post('/update', ['uses' => 'MenuController@update', 'as' => 'update.menu']);
+  Route::get('/delete/{menu_id}', ['uses' => 'MenuController@delete', 'as' => 'delete.menu']);
+});

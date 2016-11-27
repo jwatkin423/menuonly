@@ -5,7 +5,11 @@
     <div class="row">
         <div class="col-md-8 col-md-offset-2">
             <div class="panel panel-default">
-                <div class="panel-heading">Edit {{ $user->first_name . ' ' . $user->last_name }}</div>
+                @if(!$edit)
+                    <div class="panel-heading">Add New User</div>
+                @else
+                    <div class="panel-heading">Edit {{ $user->first_name . ' ' . $user->last_name }}</div>
+                @endif
                 <div class="panel-body">
                     @if(!$edit)
                         {!! Form::model($user, ['route' => 'add.user', 'class' => 'form-horizontal']) !!}
@@ -110,7 +114,6 @@
                     @endif
 
                     <div class="form-group">
-                        <div class="col-md-6 col-md-offset-4">
                             <button type="submit" class="btn btn-primary btn-block">
                                 @if(!$edit)
                                     Create
@@ -118,7 +121,6 @@
                                     Update
                                 @endif
                             </button>
-                        </div>
                     </div>
                     {!! Form::close() !!}
                 </div>
