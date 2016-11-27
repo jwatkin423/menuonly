@@ -31,7 +31,6 @@ class AddressController extends Controller {
     $Businesses = Businesses::select('business_id', 'business_name')->get();
     $businesses = $Businesses->pluck('business_name', 'business_id');
 
-//    $businessSelectParams = ['class' => 'form-control', 'id' => 'business-address', 'disabled'];
     $businessSelectParams = ['class' => 'form-control', 'id' => 'business-address'];
 
     return view('address.edit')
