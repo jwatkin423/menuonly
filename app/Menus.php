@@ -21,21 +21,12 @@ class Menus extends Model
   protected $fillable = [
     'menu_id',
     'business_id',
+    'menu_type_id',
     'menu_name',
     'date_valid_from',
     'date_valid_to',
     'range_valid_from',
     'range_valid_to'
-  ];
-
-  /**
-   * The attributes that should be hidden for arrays.
-   *
-   * @var array
-   */
-  protected $hidden = [
-    'password',
-    'remember_token',
   ];
 
   protected $primaryKey = 'menu_id';
@@ -44,6 +35,14 @@ class Menus extends Model
 
   public function business() {
     return $this->belongsTo('App\Businesses', 'business_id', 'business_id');
+  }
+
+  public function menuType() {
+    return $this->hasOne('App\MenuTypes', 'menu_type_id', 'menu_type_id');
+  }
+
+  public function menuMenuItems() {
+    return $this->hasMany('App\MenuItems', 'menu_id', 'menu_item_id');
   }
 
 }

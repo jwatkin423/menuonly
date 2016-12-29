@@ -3,21 +3,25 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 use App\Businesses;
 use App\Addresses;
 use App\BusinessTypes;
 use App\User;
 use App\Menus;
-
+//use DB;
 
 class DashboardController extends Controller {
 
   public function index($id) {
-    $businesses = null;
+    $Businesses = [];
+    $Users = [];
+    $Menus = [];
+    $addresses = [];
 
     $user = User::find([$id]);
 
-    $collect = collect($user->toArray())->map(function($item) {
+    $collect = collect($user->toArray())->map(function ($item) {
       return ['user_type' => $item['user_type']];
     });
 
@@ -27,20 +31,20 @@ class DashboardController extends Controller {
     if ($userType['user_type'] == 'admin') {
       $Businesses = Businesses::pluck('business_name', 'business_id');
 
-      $Users = User::select('user_id', 'first_name', 'last_name')->get();
-      $users = collect($Users)->map(function($item) {
-        return ['user_name' => $item['first_name'] . ' ' . $item['last_name'], 'user_id' => $item['user_id']];
+      $states = Config::get('form.state');
+      $Addresses = Addresses::select('state')->distinct()->orderBy('state', 'asc')->get();
+      $addresses = collect($Addresses)->mapWithKeys(function ($item) use ($states) {
+        $temp[$item['state']] = $states[$item['state']];
+        return $temp;
       });
 
-      $Addresses = Addresses::select('state')->distinct()->get();
-      $addresses = $Addresses->toArray();
-
+      $Users = User::select(\DB::raw("CONCAT(first_name, ' ', last_name) AS name"), 'user_id')->pluck('name', 'user_id');
       $Menus = Menus::pluck('menu_name', 'menu_id');
     }
 
     return view('dashboard.index')
       ->with('businesses', $Businesses)
-      ->with('users', $users)
+      ->with('users', $Users)
       ->with('addresses', $addresses)
       ->with('menus', $Menus)
       ->with('userData', $user);
@@ -50,12 +54,9 @@ class DashboardController extends Controller {
     $input = $request->except('_token');
     $businessId = $input['business'];
 
-    $Business = Businesses::where('business_id' ,$businessId)
-      ->with('addresses')
-      ->first();
+    $Business = Businesses::where('business_id', $businessId)->with('addresses')->first();
 
-    return view('dashboard.business')
-      ->with('business', $Business);
+    return view('dashboard.business')->with('business', $Business);
   }
 
 }

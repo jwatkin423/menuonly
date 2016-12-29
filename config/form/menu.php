@@ -1,5 +1,7 @@
 <?php
 
 return [
-  'params' => ['create' => 'form-control']
+  'params' => [
+    'create' => ['button_name' => 'Create', 'class' => 'form-control', 'id' => 'create-menu']
+  ]
 ];

@@ -25,7 +25,7 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/home';
+//    protected $redirectTo = 'dashboard/profile/1';
 
     /**
      * Create a new controller instance.
@@ -35,5 +35,10 @@ class LoginController extends Controller
     public function __construct()
     {
         $this->middleware('guest', ['except' => ['logout', 'authenticate']]);
+    }
+
+    public function redirectTo() {
+      \Log::debug("redirecting to user Id: {Auth::user()->user_id}");
+      return redirect()->route('db.home', Auth::user()->user_id);
     }
 }

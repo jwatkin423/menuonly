@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests;
+use Illuminate\Http\Request;
 use App\Addresses;
 use App\Businesses;
-use Illuminate\Http\Request;
+use App\User;
 use Auth;
 
 class AddressController extends Controller {
@@ -24,22 +24,38 @@ class AddressController extends Controller {
     return addr::find($id);
   }
 
-  public function create($ext_id, $extType) {
+  public function create($ext_id = null, $extType = null) {
     $Address = new Addresses();
 
-    $Business = ['business_id' => $ext_id];
+    if ($extType == 'B') {
+      $Business = ['business_id' => $ext_id];
+      $User = [];
+    } elseif ($extType == 'U') {
+      $Business = [];
+      $User = ['user_id' => $ext_id];
+    } else {
+      $Business = [];
+      $User = [];
+    }
+
     $Businesses = Businesses::select('business_id', 'business_name')->get();
     $businesses = $Businesses->pluck('business_name', 'business_id');
+    $Users = User::select('user_id', \DB::raw("CONCAT(first_name, ' ', last_name) as name"))->get();
+    $users = $Users->pluck('name', 'user_id');
 
-    $businessSelectParams = ['class' => 'form-control', 'id' => 'business-address'];
+    $businessSelectParams = ['class' => 'form-control', 'id' => 'business-address', 'placeholder' => 'Select a business...'];
+    $userSelectParams = ['class' => 'form-control', 'id' => 'user-address', 'placeholder' => 'Select a user...'];
 
     return view('address.edit')
       ->with('edit', false)
       ->with('address', $Address)
       ->with('business', $Business)
+      ->with('user', $User)
+      ->with('users', $users)
       ->with('ext_id', $ext_id)
       ->with('extType', $extType)
       ->with('busSelParams', $businessSelectParams)
+      ->with('userSelectParams', $userSelectParams)
       ->with('buttonName', 'Create')
       ->with('businesses', $businesses);
 
@@ -67,6 +83,12 @@ class AddressController extends Controller {
     $Address = Addresses::where('address_id', $address_id)->first();
 
     return view('address.view')->with('address', $Address);
+  }
+
+  public function viewByState(Request $state) {
+    $AddressesByState = Addresses::where('state', $state['state'])->with('business', 'user')->get();
+
+    return view('address.list_by_state')->with('AddressesByState', $AddressesByState);
   }
 
   public function edit($address_id, $extType) {
@@ -120,6 +142,7 @@ class AddressController extends Controller {
     $Addresses->fill($data);
 
     if ($Addresses->save()) {
+      \Log::debug('Updated!');
       return redirect()->route('view.business',
         [
           'business_id' => $data['business_id'],

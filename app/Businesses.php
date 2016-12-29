@@ -43,5 +43,9 @@ class Businesses extends Model {
     return $this->hasOne('App\BusinessTypes', 'business_type_id', 'business_type_id');
   }
 
+  public function menus() {
+    return $this->hasMany('App\Menus', 'business_id', 'business_id');
+  }
+
 }
 

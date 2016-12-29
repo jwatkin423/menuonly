@@ -18,7 +18,7 @@ class UserController extends Controller {
 
   }
 
-  public function create($businessId) {
+  public function create($businessId = null) {
     $User = new User();
 
     return view('user.edit')
