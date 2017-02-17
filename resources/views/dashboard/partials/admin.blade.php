@@ -17,7 +17,7 @@
     <span class="badge">{{ count($users) }}</span>
     <a class="btn btn-success btn-sm pull-right" id="new-user" href="{{ URL::route('create.user') }}">Add</a>
   </h3>
-  {!! Form::open() !!}
+  {!! Form::open(['route' => 'view.user', 'method' => 'get']) !!}
   <div class="input-group">
     {{ Form::select('user_id', $users, null, ['class' => 'form-control', 'id' => 'user-select']) }}
     <span class="input-group-btn">

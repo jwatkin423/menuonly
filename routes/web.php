@@ -46,9 +46,9 @@ Route::group(['prefix' => '/address'], function() {
 
 // User
 Route::group(['prefix' => '/user'], function() {
-  Route::get('/create/{business_id?}', ['uses' => 'UserController@create', 'as' => 'create.user']);
+  Route::get('/create', ['uses' => 'UserController@create', 'as' => 'create.user']);
   Route::post('/store', ['uses' => 'UserController@store', 'as' => 'add.user']);
-  Route::get('/view/{user_id}', ['uses' => 'UserController@view', 'as' => 'view.user']);
+  Route::get('/view', ['uses' => 'UserController@view', 'as' => 'view.user']);
   Route::get('/edit/{user_id}', ['uses' => 'UserController@edit', 'as' => 'edit.user']);
   Route::post('/update', ['uses' => 'UserController@update', 'as' => 'update.user']);
   Route::get('/delete/{user_id}', ['uses' => 'UserController@delete', 'as' => 'delete.user']);
