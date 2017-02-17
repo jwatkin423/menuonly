@@ -18,6 +18,10 @@ class UserController extends Controller {
 
   }
 
+  public function index() {
+    
+  }
+
   public function create($businessId = null) {
     $User = new User();
 
@@ -61,6 +65,16 @@ class UserController extends Controller {
       ->with('user', $User)
       ->with('user_id', $user_id)
       ->with('edit', true)
+      ->with('business_id', $User->business_id);
+  }
+
+  public function view(Request $get) {
+    $User = User::find($get['user_id'])->with('address')->first();
+
+    return view('user.edit')
+      ->with('user', $User)
+      ->with('user_id', $get['user_id'])
+      ->with('edit', false)
       ->with('business_id', $User->business_id);
   }
 
