@@ -50,7 +50,7 @@ class User extends Authenticatable {
 
   protected $table = 'users';
 
-  public function address() {
+  public function user() {
     return $this->hasOne('App\Addresses', 'user_id', 'user_id');
   }
 
